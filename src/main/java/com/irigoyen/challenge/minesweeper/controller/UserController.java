@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/users")
 public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("users/{id}")
+    @GetMapping("{id}")
     public Response<User> getUserById(@PathVariable("id") Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null)
@@ -24,7 +24,7 @@ public class UserController {
         return new Response<>(user);
     }
 
-    @PostMapping("users")
+    @PostMapping()
     public Response<User> upsertUser(@RequestBody User user) {
         if (user == null)
             return new Response<>(HttpStatus.BAD_REQUEST, "Invalid user data");

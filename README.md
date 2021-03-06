@@ -17,4 +17,21 @@ The game board would be generated using a basic algorithm, the design would allo
 It is obvious some operations could be performed on the client side (eg: timing), but the aim of this API is to make the client as dumb as possible, meaning every single operation would be performed on server side.
 The benefit of this approach in a real/commercial game wold be to have spectators, or even allow two users to play on the same board.
 
+# Board considerations
+The board is a grid of Rows (R) and Columns (C) containing a number of mines (M). R and C can be different (a rectangle). For playability reasons, the amount of mines will cover 20% of the board at most. (M <= R*C*.20)  
+
+To reduce size the board data, and improve the game performance, the elements would be stored as follows: 
+   
+- Layout. Represents the board numbers, mines and spaces. The grid will be flattened to a long string. Each character in the string will represent a cell.
     
+    On a 4x4 board Mines={1,6,15} would mean mines are placed in following coordinates {[0,1],[1,2],[3,3]} 
+    - 0->8 = number of mines around that cell. (0=empty)
+    - M = mine.
+    
+- State. Represents the flags, visible and hidden cells. This is also a string. Each character will represent the status of each cell.
+    - H = hidden
+    - F = flag
+    - X = explosion
+    - Space = visible
+
+Wining state would be where Fs matches Layout Bs, and the rest of the cells are spaces. 

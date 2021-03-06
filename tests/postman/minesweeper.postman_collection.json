@@ -1,0 +1,226 @@
+{
+	"info": {
+		"_postman_id": "dc3fad6e-1db7-462a-a6ba-981810f5d540",
+		"name": "minesweeper",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "New User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.not.be.error; \r",
+									"    pm.response.to.not.have.jsonBody(\"\"); \r",
+									"    pm.response.to.not.have.jsonBody(\"error\"); \r",
+									"})\r",
+									"\r",
+									"pm.test(\"Payload exist\", function(){\r",
+									"    pm.response.to.have.jsonBody(\"payload\"); \r",
+									"})\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"operation succeed\", function () { \r",
+									"    pm.expect(jsonData.payload).to.not.be.undefined;\r",
+									"    pm.expect(jsonData.status).to.be.eq(\"OK\");    \r",
+									"});\r",
+									"\r",
+									"if(jsonData.payload)\r",
+									"{\r",
+									"    pm.environment.set(\"lastUserId\", jsonData.payload.id);\r",
+									"    pm.environment.set(\"lastUserName\", jsonData.payload.name);\r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var time = Math.floor(Date.now() / 1000);\r",
+									"pm.environment.set(\"timestamp\", time);\r",
+									"pm.environment.set(\"randomUserName\", \"usr\"+time);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"{{randomUserName}}\",\r\n    \"image\":\"https://robohash.org/{{randomUserName}}.png\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/api/v1/users",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New User Exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.not.be.error; \r",
+									"})\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"operation failed\", function () { \r",
+									"    pm.expect(jsonData.payload).to.be.null;\r",
+									"    pm.expect(jsonData.status).to.be.eq(\"BAD_REQUEST\");    \r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"{{lastUserName}}\",\r\n    \"image\":\"https://robohash.org/{{lastUserName}}.png\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/api/v1/users",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.not.be.error; \r",
+									"    pm.response.to.not.have.jsonBody(\"\"); \r",
+									"    pm.response.to.not.have.jsonBody(\"error\"); \r",
+									"})\r",
+									"\r",
+									"pm.test(\"Payload exist\", function(){\r",
+									"    pm.response.to.have.jsonBody(\"payload\"); \r",
+									"})\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"operation succeed\", function () { \r",
+									"    pm.expect(jsonData.payload).to.not.be.undefined;\r",
+									"    pm.expect(jsonData.status).to.be.eq(\"OK\");    \r",
+									"    var usrName = pm.environment.get(\"lastUserName\");\r",
+									"    pm.expect(jsonData.payload.name).to.be.eq(usrName);\r",
+									"    pm.environment.set(\"lastUserName\", jsonData.payload.name);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/v1/users/{{lastUserId}}",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{lastUserId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Local Env",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.test(\"Change environment\", function () {\r",
+									"    pm.environment.set(\"HOST\", \"http://localhost:8080\");\r",
+									"    pm.environment.set(\"defaultUser\", \"testUser\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/time",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"time"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

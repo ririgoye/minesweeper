@@ -2,8 +2,8 @@ package com.irigoyen.challenge.minesweeper.service;
 
 import com.irigoyen.challenge.minesweeper.infrastructure.Response;
 import com.irigoyen.challenge.minesweeper.infrastructure.Utils;
-import com.irigoyen.challenge.minesweeper.model.Board;
-import com.irigoyen.challenge.minesweeper.repository.BoardRepository;
+import com.irigoyen.challenge.minesweeper.model.Game;
+import com.irigoyen.challenge.minesweeper.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,22 +18,18 @@ import java.util.function.Consumer;
 @Service
 public class GameService {
     @Autowired
-    BoardRepository boardRepository;
+    GameRepository gameRepository;
 
-    public Board createBoard(Long userId, int rows, int columns, int mines) {
-        Board board = new Board();
-        board.setUserId(userId);
-        board.setRows(rows);
-        board.setColumns(columns);
-        board.setStartTime(LocalDateTime.now());
-        board.setStatus(Board.Status.STARTED);
+    public Game createGame(Long userId, int rows, int columns, int mines) {
+        Game game = new Game();
+        game.setUserId(userId);
+        game.setRows(rows);
+        game.setColumns(columns);
+        game.setMines(mines);
+        game.resetGame();
 
-        int size = board.getSize();
-
-        //completely covered grid (Hidden cells)
-        String state = new String(Utils.fillArray('H', size));
-        board.setState(state);
-        //board with no mines
+        int size = game.getSize();
+        //game with no mines
         char[] layout = Utils.fillArray('0', size);
 
         //using a set instead of a list so duplicated values are automatically ignored
@@ -58,9 +54,9 @@ public class GameService {
         for (int i = 0; i < size; i++) {
             layout[i] = getCellValue(i, minePositions, rows, columns, cellDeltas);
         }
-        board.setLayout(new String(layout));
-        boardRepository.save(board);
-        return board;
+        game.setLayout(new String(layout));
+        gameRepository.save(game);
+        return game;
     }
 
     //TODO: This could be a cached value
@@ -119,36 +115,59 @@ public class GameService {
         }
     }
 
-
-    public Response<Board> performAction(Board board, String action, int cell) {
-        Response<Board> response = new Response<>(board);
+    public Response<Game> performAction(Game game, String action, int cell) {
+        Response<Game> response = new Response<>(game);
         switch (action) {
             case "PAUSE":
+                //Only pause started games
+                if (game.getStatus() == Game.Status.STARTED) {
+                    game.setStatus(Game.Status.PAUSED);
+                    game.calculateElapsedTime();
+                    gameRepository.save(game);
+                }
                 return response;
             case "RESUME":
+                //Only resume paused games
+                if (game.getStatus() == Game.Status.PAUSED) {
+                    game.setStatus(Game.Status.STARTED);
+                    //Start time is never displayed, we just used to calculate the time difference.
+                    // subtracting current elapsed time will allow us to continue with the timer.
+                    LocalDateTime newStartTime = LocalDateTime.now().minusSeconds(game.getElapsedTime());
+                    game.setStartTime(newStartTime);
+                    game.setElapsedTime(0l);
+                    gameRepository.save(game);
+                }
                 return response;
             case "RESET":
+                game.resetGame();
+                gameRepository.save(game);
                 return response;
         }
 
-        if (cell < 0 || cell > board.getSize())
-            return response.setStatus(HttpStatus.BAD_REQUEST, "Invalid cell number, it should be between 0 and " + board.getSize());
+        //We can only perform click/flag actions on running games
+        if (game.getStatus() != Game.Status.STARTED)
+            return response;
+
+        if (cell < 0 || cell > game.getSize())
+            return response.setStatus(HttpStatus.BAD_REQUEST, "Invalid cell number, it should be between 0 and " + game.getSize());
 
         action = action.toUpperCase();
-        char[] state = board.getState().toCharArray();
-        char[] layout = board.getLayout().toCharArray();
+        char[] state = game.getState().toCharArray();
+        char[] layout = game.getLayout().toCharArray();
         char cellState = state[cell];
         switch (action) {
             case "CLICK":
                 if (cellState == ' ')
                     //if cell is already clear ignore
                     break;
-                if (layout[cell] == 'M') //Clicked a mine
+                //Clicked a mine
+                if (layout[cell] == 'M') {
                     state[cell] = 'X'; //BOOM
-                else //clicked a number or blank
+                    game.setStatus(Game.Status.LOST);
+                } else //clicked a number or blank
                 {
-                    int[] deltas = getDeltas(board.getColumns());
-                    clearEmptyCells(cell, board.getRows(), board.getColumns(), layout, state, deltas);
+                    int[] deltas = getDeltas(game.getColumns());
+                    clearEmptyCells(cell, game.getRows(), game.getColumns(), layout, state, deltas);
                 }
                 break;
             case "FLAG":
@@ -161,11 +180,36 @@ public class GameService {
                 return response.setStatus(HttpStatus.BAD_REQUEST, "Invalid action (" + action + "). Valid actions are CLICK, FLAG, PAUSE, RESUME");
         }
         String newState = new String(state);
-        if(!newState.equals(board.getState())) {
-            board.setState(newState);
-            boardRepository.save(board);
+        if (!newState.equals(game.getState())) {
+            //Only save if game changed
+            game.setState(newState);
+            checkGameStatus(game);
+            gameRepository.save(game);
         }
         return response;
+    }
+
+    private void checkGameStatus(Game game) {
+        String state = game.getState();
+        if (state.contains("X")) {
+            game.setStatus(Game.Status.LOST);
+            game.calculateElapsedTime();
+            return;
+        }
+        //if there are no more hidden cells
+        if (!state.contains("H")) {
+            char[] chars = state.toCharArray();
+            //count flags
+            int flagsCount = 0;
+            for (char c : chars) {
+                if (c == 'F')
+                    flagsCount++;
+            }
+            if (flagsCount == game.getMines()) {
+                game.setStatus(Game.Status.WON);
+                game.calculateElapsedTime();
+            }
+        }
     }
 
     private static void clearEmptyCells(int cell, int rows, int columns, char[] layout, char[] state, int[] deltas) {
@@ -173,7 +217,7 @@ public class GameService {
         clearEmptyCells(cell, rows, columns, layout, toClear, deltas);
 
         for (Integer i : toClear) {
-            state[i]=' ';
+            state[i] = ' ';
         }
     }
 

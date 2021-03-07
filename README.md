@@ -7,6 +7,18 @@ I'm using Java/Spring Boot because this is the language I'm currently working on
 
 I picked heroku platform to deploy the application for its ease of use, simplicity and its price (free). This decision limited my options on databases to use. I wanted to use a NoSQL database because of their speed and data simplicity. They don't have one easily available, so I decided to use Postgresql.
 
+# Running locally
+You will need to install PosgreSQL and create a "minesweeper" db.
+You will need to define following environment variables:
+- JDBC_DATABASE_URL=jdbc:postgresql://localhost:5432/minesweeper
+
+    The URL is just an example, db name and port can be different
+- JDBC_DATABASE_USERNAME={{your DB user name}}
+- JDBC_DATABASE_PASSWORD={{your DB password}}
+
+**WARNING**: The project uses lombok library. It reduces the amount of code because it autogenerate getters and setters. lombok plugin needs to be installed in the IDE of your choice, or the IDE will show errors. More details: [Project lombok](https://projectlombok.org/setup/overview)
+
+
 # Deployment
 Deployment will be done connecting heroku to the github repository, and configuring the credentials and other parameters using environment variables.
 
@@ -34,4 +46,8 @@ To reduce size the board data, and improve the game performance, the elements wo
     - X = explosion
     - Space = visible
 
-Wining state would be where Fs matches Layout Bs, and the rest of the cells are spaces. 
+Wining state would be where Fs matches Layout Bs, and the rest of the cells are spaces.
+
+#Game change
+The initial idea was to create a board as a template, so we could create multiple games from it. 
+I changed the idea (renamed board to game) because the board details is just a string that, if required, can be copied from game to game. 

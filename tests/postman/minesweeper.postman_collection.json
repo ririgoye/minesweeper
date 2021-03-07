@@ -365,7 +365,275 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userId\":1,\r\n    \"action\":\"CLICK\",\r\n    \"cell\":9\r\n}",
+							"raw": "{\r\n    \"userId\":1,\r\n    \"action\":\"CLICK\",\r\n    \"cell\":4\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/api/v1/games/1/action",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"games",
+								"1",
+								"action"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Flag Cell",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.not.be.error; \r",
+									"    pm.response.to.not.have.jsonBody(\"\"); \r",
+									"    pm.response.to.not.have.jsonBody(\"error\"); \r",
+									"})\r",
+									"\r",
+									"pm.test(\"Payload exist\", function(){\r",
+									"    pm.response.to.have.jsonBody(\"payload\"); \r",
+									"})\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"operation succeed\", function () { \r",
+									"    pm.expect(jsonData.payload).to.not.be.undefined;\r",
+									"    pm.expect(jsonData.status).to.be.eq(\"OK\");    \r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\":1,\r\n    \"action\":\"FLAG\",\r\n    \"cell\":9\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/api/v1/games/1/action",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"games",
+								"1",
+								"action"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.not.be.error; \r",
+									"    pm.response.to.not.have.jsonBody(\"\"); \r",
+									"    pm.response.to.not.have.jsonBody(\"error\"); \r",
+									"})\r",
+									"\r",
+									"pm.test(\"Payload exist\", function(){\r",
+									"    pm.response.to.have.jsonBody(\"payload\"); \r",
+									"})\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"operation succeed\", function () { \r",
+									"    pm.expect(jsonData.payload).to.not.be.undefined;\r",
+									"    pm.expect(jsonData.status).to.be.eq(\"OK\");    \r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\":1,\r\n    \"action\":\"RESET\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/api/v1/games/1/action",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"games",
+								"1",
+								"action"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pause Game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.not.be.error; \r",
+									"    pm.response.to.not.have.jsonBody(\"\"); \r",
+									"    pm.response.to.not.have.jsonBody(\"error\"); \r",
+									"})\r",
+									"\r",
+									"pm.test(\"Payload exist\", function(){\r",
+									"    pm.response.to.have.jsonBody(\"payload\"); \r",
+									"})\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"operation succeed\", function () { \r",
+									"    pm.expect(jsonData.payload).to.not.be.undefined;\r",
+									"    pm.expect(jsonData.status).to.be.eq(\"OK\");    \r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\":1,\r\n    \"action\":\"PAUSE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/api/v1/games/1/action",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"games",
+								"1",
+								"action"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resume Game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.not.be.error; \r",
+									"    pm.response.to.not.have.jsonBody(\"\"); \r",
+									"    pm.response.to.not.have.jsonBody(\"error\"); \r",
+									"})\r",
+									"\r",
+									"pm.test(\"Payload exist\", function(){\r",
+									"    pm.response.to.have.jsonBody(\"payload\"); \r",
+									"})\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"operation succeed\", function () { \r",
+									"    pm.expect(jsonData.payload).to.not.be.undefined;\r",
+									"    pm.expect(jsonData.status).to.be.eq(\"OK\");    \r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\":1,\r\n    \"action\":\"RESUME\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

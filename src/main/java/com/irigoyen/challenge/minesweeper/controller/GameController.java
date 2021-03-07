@@ -3,8 +3,8 @@ package com.irigoyen.challenge.minesweeper.controller;
 import com.irigoyen.challenge.minesweeper.infrastructure.DynamicBody;
 import com.irigoyen.challenge.minesweeper.infrastructure.Response;
 import com.irigoyen.challenge.minesweeper.infrastructure.Utils;
-import com.irigoyen.challenge.minesweeper.model.Board;
-import com.irigoyen.challenge.minesweeper.repository.BoardRepository;
+import com.irigoyen.challenge.minesweeper.model.Game;
+import com.irigoyen.challenge.minesweeper.repository.GameRepository;
 import com.irigoyen.challenge.minesweeper.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,32 +16,32 @@ import java.util.List;
 @RequestMapping("/api/v1/games")
 public class GameController {
     @Autowired
-    private BoardRepository boardRepository;
+    private GameRepository gameRepository;
     @Autowired
     private GameService gameService;
 
     @GetMapping("{id}")
-    public Response<Board> getBoard(@PathVariable("id") Long boardId,
+    public Response<Game> getGame(@PathVariable("id") Long gameId,
                                         @RequestParam("userId") Long userId) {
         //TODO: change userId for an auth token.
-        return getBoardById(userId, boardId);
+        return getGameById(userId, gameId);
     }
 
     //TODO: move this method to a UserService
-    private Response<Board> getBoardById(Long userId, Long boardId) {
-        Board board = boardRepository.findById(boardId).orElse(null);
-        if (board != null && board.getUserId() != userId)
-            return new Response<Board>().setStatus(HttpStatus.FORBIDDEN, "The user is not the board's owner");
-        return new Response<>(board);
+    private Response<Game> getGameById(Long userId, Long gameId) {
+        Game game = gameRepository.findById(gameId).orElse(null);
+        if (game != null && game.getUserId() != userId)
+            return new Response<Game>().setStatus(HttpStatus.FORBIDDEN, "The user is not the game's owner");
+        return new Response<>(game);
     }
 
     @PostMapping("")
-    public Response<Board> createBoard(@RequestBody DynamicBody body) {
+    public Response<Game> createGame(@RequestBody DynamicBody body) {
         List<String> missingFields = body.checkRequiredValues("rows", "columns", "mines", "userId");
         if (missingFields.size() > 0)
             return new Response<>(HttpStatus.BAD_REQUEST, "Following fields are required: " + missingFields.toString());
         //DynamicBody allows us to get api data without having to create DTO objects.
-        //We can't use Board class as a DTO because fields (like mines) won't match
+        //We can't use Game class as a DTO because fields (like mines) won't match
         int rows = body.getInt("rows");
         int columns = body.getInt("columns");
         int mines = body.getInt("mines");
@@ -56,11 +56,11 @@ public class GameController {
         //TODO: this should be a token
         Long userId = body.getLong("userId");
         //TODO: check for user existence
-        Board board = gameService.createBoard(userId, rows, columns, mines);
-        return new Response<>(board);
+        Game game = gameService.createGame(userId, rows, columns, mines);
+        return new Response<>(game);
     }
     @PostMapping("{id}/action")
-    public Response<Board> doAction(@PathVariable("id") Long boardId,
+    public Response<Game> doAction(@PathVariable("id") Long gameId,
                                     @RequestBody DynamicBody body) {
         List<String> missingFields = body.checkRequiredValues("action", "userId");
         if (missingFields.size() > 0)
@@ -68,7 +68,7 @@ public class GameController {
         String action = body.getString("action");
         int cell = body.getInt("cell",-1);
         Long userId = body.getLong("userId");
-        Response<Board> response = getBoardById(userId, boardId);
+        Response<Game> response = getGameById(userId, gameId);
         if (!response.isOK())
             return response;
         return gameService.performAction(response.getPayload(),  action, cell);

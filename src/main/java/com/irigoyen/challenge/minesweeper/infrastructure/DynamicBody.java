@@ -1,7 +1,9 @@
 package com.irigoyen.challenge.minesweeper.infrastructure;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Class to read JSON data posted to rest services without needing to create an object for that.
@@ -10,6 +12,12 @@ public class DynamicBody extends HashMap<String, Object> {
 
     public Integer getInt(String field) {
         return Utils.toInt(get(field));
+    }
+    public Integer getInt(String field, Integer defaultValue) {
+        Integer val = Utils.toInt(get(field));
+        if(val==null)
+            return defaultValue;
+        return val;
     }
 
     public Long getLong(String field) {

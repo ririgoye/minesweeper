@@ -21,9 +21,14 @@ public class GameController {
     private GameService gameService;
 
     @GetMapping("{id}")
-    public Response<Board> getBoardById(@PathVariable(value = "id", required = false) Long boardId,
+    public Response<Board> getBoard(@PathVariable("id") Long boardId,
                                         @RequestParam("userId") Long userId) {
         //TODO: change userId for an auth token.
+        return getBoardById(userId, boardId);
+    }
+
+    //TODO: move this method to a UserService
+    private Response<Board> getBoardById(Long userId, Long boardId) {
         Board board = boardRepository.findById(boardId).orElse(null);
         if (board != null && board.getUserId() != userId)
             return new Response<Board>().setStatus(HttpStatus.FORBIDDEN, "The user is not the board's owner");
@@ -31,7 +36,7 @@ public class GameController {
     }
 
     @PostMapping("")
-    public Response<Board> getBoardById(@RequestBody DynamicBody body) {
+    public Response<Board> createBoard(@RequestBody DynamicBody body) {
         List<String> missingFields = body.checkRequiredValues("rows", "columns", "mines", "userId");
         if (missingFields.size() > 0)
             return new Response<>(HttpStatus.BAD_REQUEST, "Following fields are required: " + missingFields.toString());
@@ -54,4 +59,19 @@ public class GameController {
         Board board = gameService.createBoard(userId, rows, columns, mines);
         return new Response<>(board);
     }
+    @PostMapping("{id}/action")
+    public Response<Board> doAction(@PathVariable("id") Long boardId,
+                                    @RequestBody DynamicBody body) {
+        List<String> missingFields = body.checkRequiredValues("action", "userId");
+        if (missingFields.size() > 0)
+            return new Response<>(HttpStatus.BAD_REQUEST, "Following fields are required: " + missingFields.toString());
+        String action = body.getString("action");
+        int cell = body.getInt("cell",-1);
+        Long userId = body.getLong("userId");
+        Response<Board> response = getBoardById(userId, boardId);
+        if (!response.isOK())
+            return response;
+        return gameService.performAction(response.getPayload(),  action, cell);
+    }
+
 }

@@ -22,26 +22,26 @@ public class Board {
     private Integer columns;
     /**
      * Game board layout. This will not change once defined
-     *  0->8 = number of mines around that cell. (0=empty)
-     *  M = mine.
+     * 0->8 = number of mines around that cell. (0=empty)
+     * M = mine.
      */
     @Column
     private String layout;
     /**
      * Status of each cell. This will be modified when the user click the grid.
-     *
-     *  H = hidden
-     *  F = flag
-     *  X = explosion
-     *  Space = visible
+     * 
+     * H = hidden
+     * F = flag
+     * X = explosion
+     * Space = visible
      */
     @Column
-    private String status;
+    private String state;
     /**
      * won | loosed | paused
      */
     @Column
-    private String result;
+    private Status status;
     /**
      * When game was stared or resumed
      */
@@ -52,4 +52,12 @@ public class Board {
      */
     @Column
     private Integer elapsedTime;
+
+    public int getSize() {
+        return rows * columns;
+    }
+
+    public enum Status {
+        STARTED, WON, LOST, PAUSED
+    }
 }

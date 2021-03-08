@@ -116,13 +116,18 @@ public class GameService {
     }
 
     public Response<Game> performAction(Game game, String action, int cell) {
+
+        if (game.getStatus() == Game.Status.STARTED) {
+            //As long as the game is running, We need to always return the correct elapsed time.
+            // No calculations should be done on the client
+            game.calculateElapsedTime();
+        }
         Response<Game> response = new Response<>(game);
         switch (action) {
             case "PAUSE":
                 //Only pause started games
                 if (game.getStatus() == Game.Status.STARTED) {
                     game.setStatus(Game.Status.PAUSED);
-                    game.calculateElapsedTime();
                     gameRepository.save(game);
                 }
                 return response;
@@ -134,7 +139,6 @@ public class GameService {
                     // subtracting current elapsed time will allow us to continue with the timer.
                     LocalDateTime newStartTime = LocalDateTime.now().minusSeconds(game.getElapsedTime());
                     game.setStartTime(newStartTime);
-                    game.setElapsedTime(0l);
                     gameRepository.save(game);
                 }
                 return response;

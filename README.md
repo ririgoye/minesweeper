@@ -18,16 +18,18 @@ You will need to define following environment variables:
 
 **WARNING**: The project uses lombok library. It reduces the amount of code because it autogenerate getters and setters. lombok plugin needs to be installed in the IDE of your choice, or the IDE will show errors. More details: [Project lombok](https://projectlombok.org/setup/overview)
 
-
 # Deployment
 Deployment will be done connecting heroku to the github repository, and configuring the credentials and other parameters using environment variables.
 
+CI/CD could be accomplished using postmant test cases (included in /tests folder) 
+
 # Design
-The service requires user management to remember previous games and to persist per user information. Some token based security/authentication should also be added to avoid users accessing other peoples games.
-The game board would be generated using a basic algorithm, the design would allow for it to be improved/modified.
+The service requires users’ management. The user's information is required to remember previous games and to persist per-user information.
+I'm using basic usr/pwd authentication. Some token-based security/authentication should later be added to avoid users accessing other people’s games.
+The game board would be generated using a basic algorithm, placing the bombs in random order. (meaning some games can be really easy and other really difficult). The design would allow for it to be improved/modified.
 
 It is obvious some operations could be performed on the client side (eg: timing), but the aim of this API is to make the client as dumb as possible, meaning every single operation would be performed on server side.
-The benefit of this approach in a real/commercial game wold be to have spectators, or even allow two users to play on the same board.
+The benefit of this approach, in a real/commercial game, is to allow spectators, or even allow two users playing on the same board.
 
 # Board considerations
 The board is a grid of Rows (R) and Columns (C) containing a number of mines (M). R and C can be different (a rectangle). For playability reasons, the amount of mines will cover 20% of the board at most. (M <= R*C*.20)  

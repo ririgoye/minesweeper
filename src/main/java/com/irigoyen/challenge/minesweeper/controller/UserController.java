@@ -1,10 +1,12 @@
 package com.irigoyen.challenge.minesweeper.controller;
 
+import com.irigoyen.challenge.minesweeper.infrastructure.DynamicBody;
 import com.irigoyen.challenge.minesweeper.infrastructure.Response;
 import com.irigoyen.challenge.minesweeper.model.Game;
 import com.irigoyen.challenge.minesweeper.model.User;
 import com.irigoyen.challenge.minesweeper.repository.GameRepository;
 import com.irigoyen.challenge.minesweeper.repository.UserRepository;
+import com.irigoyen.challenge.minesweeper.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,8 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private GameRepository gameRepository;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("{id}")
     public Response<User> getUserById(@PathVariable("id") Long userId) {
@@ -34,32 +38,16 @@ public class UserController {
         statusFilter.add(Game.Status.STARTED);
         statusFilter.add(Game.Status.PAUSED);
         List<Game> games = gameRepository.findByUserIdAndStatusInOrderByStartTimeDesc(userId, statusFilter);
-        if (games == null || games.size() <1)
+        if (games == null || games.size() < 1)
             return new Response<Game>().setStatus(HttpStatus.NOT_FOUND, "User has no previous games");
         return new Response<>(games.get(0));
     }
 
     @PostMapping()
-    public Response<User> upsertUser(@RequestBody User user) {
-        if (user == null)
-            return new Response<>(HttpStatus.BAD_REQUEST, "Invalid user data");
-        Long userId = user.getId();
-        if (userId != null) {
-            //if userId already exists we will update the user details.
-            User dbUser = userRepository.findById(userId).orElse(null);
-            if (dbUser == null)
-                return new Response<>(HttpStatus.BAD_REQUEST, "User id doesn't exist. User can't be updated");
-            dbUser.setName(user.getName());
-            dbUser.setImage(user.getImage());
-            //TODO: update other fields when added
-            user = dbUser;
-        } else {
-            //TODO: move this to another endpoint to check for existence before submitting (as user types)
-            List<User> dbUsers = userRepository.findByName(user.getName());
-            if(dbUsers.size()>0)
-                return new Response<>(HttpStatus.BAD_REQUEST, "User name already exists");
-        }
-        user = userRepository.save(user);
-        return new Response<>(user);
+    public Response<User> upsertUser(@RequestBody DynamicBody user) {
+        List<String> missingFields = user.checkRequiredValues("name", "password");
+        if (missingFields.size() > 0)
+            return new Response<>(HttpStatus.BAD_REQUEST, "Following fields are required: " + missingFields.toString());
+        return userService.upsert(user);
     }
 }

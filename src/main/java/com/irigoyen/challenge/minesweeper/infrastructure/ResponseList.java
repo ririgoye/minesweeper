@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * Same concept as Response class but used to handle lists
  */
-
 @Getter
 @Setter
 public class ResponseList<T> extends Response<List<T>>

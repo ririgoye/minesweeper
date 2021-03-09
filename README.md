@@ -52,4 +52,11 @@ Wining state would be where Fs matches Layout Bs, and the rest of the cells are 
 
 #Game change
 The initial idea was to create a board as a template, so we could create multiple games from it. 
-I changed the idea (renamed board to game) because the board details is just a string that, if required, can be copied from game to game. 
+I changed the idea (renamed board to game) because the board details is just a string that, if required, can be copied from game to game.
+
+#Documentation
+Application comes with self generated JavaDoc and Swagger. It can be obtained by:
+- Swagger: Going to \swagger-ui.html 
+- JavaDoc:
+    - Execute  mvn javadoc:javadoc
+    - resulting documents would be placed in: /target/site/apidocs

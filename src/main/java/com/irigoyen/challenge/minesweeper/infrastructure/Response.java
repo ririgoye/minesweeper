@@ -1,6 +1,5 @@
 package com.irigoyen.challenge.minesweeper.infrastructure;
 
-import com.irigoyen.challenge.minesweeper.model.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;

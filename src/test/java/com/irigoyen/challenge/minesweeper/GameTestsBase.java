@@ -16,7 +16,6 @@ public class GameTestsBase {
     @Before
     public void setUpStreams() {
         gameLayout = "MM100221111111M1M111";
-
         mockGame = new Game();
         mockGame.setId(1l);
         mockGame.setUserId(1l);

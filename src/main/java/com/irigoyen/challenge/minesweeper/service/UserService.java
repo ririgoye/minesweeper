@@ -15,6 +15,11 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Signs in/up a user
+     * @param userData user information to use/check
+     * @return valid user information
+     */
     public Response<User> upsert(DynamicBody userData) {
         //TODO: I'm using this as login/signup option.
         // This should be moved to some OAuth service

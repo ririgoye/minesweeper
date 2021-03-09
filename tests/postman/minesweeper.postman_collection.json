@@ -61,7 +61,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\":\"{{randomUserName}}\",\r\n    \"image\":\"https://robohash.org/{{randomUserName}}.png\"\r\n}",
+							"raw": "{\r\n    \"name\":\"{{randomUserName}}\",\r\n    \"image\":\"https://robohash.org/{{randomUserName}}.png\",\r\n    \"password\":\"P4SSW0RD\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -702,6 +702,52 @@
 								"games",
 								"1",
 								"action"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Docs",
+			"item": [
+				{
+					"name": "Get Swagger docs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.not.be.error; \r",
+									"    pm.response.to.not.have.jsonBody(\"\"); \r",
+									"    pm.response.to.not.have.jsonBody(\"error\"); \r",
+									"})\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"swagger is working\", function () { \r",
+									"    pm.expect(jsonData.swagger).to.be.eq(\"2.0\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/v2/api-docs",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"v2",
+								"api-docs"
 							]
 						}
 					},

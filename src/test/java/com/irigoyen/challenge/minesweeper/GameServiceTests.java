@@ -32,6 +32,7 @@ public class GameServiceTests extends GameTestsBase {
         Assert.assertEquals(game.getLayout(),gameLayout);
         Assert.assertEquals(game.getState(),clickGameState);
     }
+
     @Test
     public void mineClicked() throws Exception {
         //Just ignore save
@@ -44,6 +45,23 @@ public class GameServiceTests extends GameTestsBase {
         Assert.assertTrue(resultGame.isOK());
         Game game = resultGame.getPayload();
         String clickGameState = replaceChar("HHHHHHHHHHHHHHHHHHHH",mineIndex,'X');
+        Assert.assertEquals(game.getLayout(),gameLayout);
+        Assert.assertEquals(game.getState(),clickGameState);
+        Assert.assertEquals(game.getStatus(),Game.Status.LOST);
+    }
+
+    @Test
+    public void spaceClicked() {
+        //Just ignore save
+        Mockito.when(
+                gameRepository.save(Mockito.any())
+        ).thenReturn(null);
+        //blank cell should clear cells around it
+        int mineIndex = 3;
+        Response<Game> resultGame = gameService.performAction(mockGame, "CLICK", mineIndex);
+        Assert.assertTrue(resultGame.isOK());
+        Game game = resultGame.getPayload();
+        String clickGameState ="HH   HH   HHHHHHHHHH";
         Assert.assertEquals(game.getLayout(),gameLayout);
         Assert.assertEquals(game.getState(),clickGameState);
     }

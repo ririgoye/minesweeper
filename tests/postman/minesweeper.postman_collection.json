@@ -83,7 +83,7 @@
 					"response": []
 				},
 				{
-					"name": "New User Exist",
+					"name": "Get last user's game",
 					"event": [
 						{
 							"listen": "test",
@@ -96,9 +96,9 @@
 									"\r",
 									"var jsonData = pm.response.json();\r",
 									"\r",
-									"pm.test(\"operation failed\", function () { \r",
-									"    pm.expect(jsonData.payload).to.be.null;\r",
-									"    pm.expect(jsonData.status).to.be.eq(\"BAD_REQUEST\");    \r",
+									"pm.test(\"operation pased\", function () { \r",
+									"    pm.expect(jsonData.payload).to.be.not.null;\r",
+									"    pm.expect(jsonData.status).to.be.eq(\"OK\");    \r",
 									"});\r",
 									""
 								],
@@ -107,26 +107,19 @@
 						}
 					],
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\":\"{{lastUserName}}\",\r\n    \"image\":\"https://robohash.org/{{lastUserName}}.png\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{HOST}}/api/v1/users",
+							"raw": "{{HOST}}/api/v1/users/1/lastgame",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"users"
+								"users",
+								"1",
+								"lastgame"
 							]
 						}
 					},
@@ -316,6 +309,64 @@
 								"api",
 								"v1",
 								"games"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Last Game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", function(){\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.response.to.not.be.error; \r",
+									"    pm.response.to.not.have.jsonBody(\"\"); \r",
+									"    pm.response.to.not.have.jsonBody(\"error\"); \r",
+									"})\r",
+									"\r",
+									"pm.test(\"Payload exist\", function(){\r",
+									"    pm.response.to.have.jsonBody(\"payload\"); \r",
+									"})\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"operation succeed\", function () { \r",
+									"    pm.expect(jsonData.payload).to.not.be.undefined;\r",
+									"    pm.expect(jsonData.status).to.be.eq(\"OK\");    \r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/api/v1/users/1/lastgame",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"1",
+								"lastgame"
 							]
 						}
 					},

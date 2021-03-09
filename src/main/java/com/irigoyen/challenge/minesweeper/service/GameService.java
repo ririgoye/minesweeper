@@ -40,16 +40,6 @@ public class GameService {
             minePositions.add(position);
         }
 
-        /*
-            //Test data
-            //01234567890123456789
-            //MM100221111111M1M111
-            minePositions.add(0);
-            minePositions.add(1);
-            minePositions.add(14);
-            minePositions.add(16);
-        */
-
         int[] cellDeltas = getDeltas(columns);
         for (int i = 0; i < size; i++) {
             layout[i] = getCellValue(i, minePositions, rows, columns, cellDeltas);
